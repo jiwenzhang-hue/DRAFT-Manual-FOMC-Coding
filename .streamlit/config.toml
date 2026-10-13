@@ -1,0 +1,7 @@
+[theme]
+base = "light"
+font = "Arial, sans-serif"
+
+[client]
+showErrorDetails = false
+toolbarMode = "minimal"
