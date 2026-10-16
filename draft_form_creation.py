@@ -18,11 +18,10 @@ import streamlit as st
 # ============================================================
 
 # Choose the dataset and assigned statement here.
-SAMPLING_FOLDER = Path(__file__).resolve().parent.parent
-DATASET_FILE = "raw_data/fomc_statements_cleaned.csv"
+SAMPLING_FOLDER = Path(__file__).resolve().parent
+DATASET_FILE = "fomc_statements_cleaned.csv"
 ASSIGNED_STATEMENT_ID = "statement_20000202"
 RAW_CSV = SAMPLING_FOLDER / DATASET_FILE
-
 # Set these to the column names in the selected CSV.
 ID_COLUMN = "id"
 DATE_COLUMN = "date"
