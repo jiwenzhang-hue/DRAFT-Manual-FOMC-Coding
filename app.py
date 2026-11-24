@@ -28,6 +28,7 @@ if not RAW_EXCEL.exists():
 
 STATEMENTS_SHEET = "All 10 statements"
 FORM_VERSION = 3
+FORM_ID = "labor_statements"
 
 SELECTED_IDS = [
     "statement_20060629",
@@ -48,46 +49,15 @@ SELECTED_IDS = [
 # ============================================================
 
 INDICATOR_DESCRIPTIONS = {
-    "Core Inflation": (
-        "Core or underlying inflation without specifying CPI or PCE."
-    ),
-    "Core CPI": (
-        "Consumer Price Index (CPI) inflation excluding food and energy."
-    ),
-    "Core PCE": (
-        "Personal Consumption Expenditures (PCE) inflation excluding "
-        "food and energy; also includes trimmed-mean PCE."
-    ),
-    "Headline Inflation": (
-        "Overall or headline inflation without specifying CPI or PCE."
-    ),
-    "Headline CPI": "Overall CPI inflation, including food and energy.",
-    "Headline PCE": "Overall PCE inflation, including food and energy.",
-    "Services": "Service prices or services inflation.",
-    "Goods": "Goods prices, including consumer and imported goods.",
-    "Housing": (
-        "House prices, rents, shelter costs, or housing services prices."
-    ),
-    "Energy": "Energy prices, including oil, gasoline, and utilities.",
-    "Food": (
-        "Food prices or food inflation, beyond references to exclusions."
-    ),
-    "PPI": "Producer Price Index (PPI): prices received by producers.",
-    "Wage Inflation": (
-        "Wage growth or labor compensation, including earnings "
-        "and employment costs."
-    ),
-    "Inflation Expectations": (
-        "Expected future inflation, including surveys "
-        "and market-based measures."
-    ),
-    "Commodity Prices": (
-        "Commodity or raw-material prices, including crude oil."
-    ),
-    "General Inflation": (
-        "Inflation or price discussion without a specific price, "
-        "sector, or measure."
-    ),
+    "General Labor": "Overall labor market conditions, such as strength or tightness.",
+    "Employment": "People with jobs, payroll employment, or net job gains and losses.",
+    "Unemployment": "People who are unemployed, or the share of the labor force unemployed.",
+    "Participation": "The share of the working-age population in the labor force.",
+    "Wages": "Pay earned for work, including earnings and wage growth.",
+    "Vacancies": "Unfilled job openings employers are trying to fill.",
+    "Quits": "Workers leaving their jobs voluntarily, excluding retirements.",
+    "Layoffs": "Employer-initiated job separations, including discharges.",
+    "Hiring": "Workers being added to employer payrolls, including replacement hires.",
 }
 
 INDICATORS = list(INDICATOR_DESCRIPTIONS)
@@ -253,7 +223,7 @@ def load_statements():
 
 def dataset_signature(statements):
     content = json.dumps(
-        statements,
+        {"form_id": FORM_ID, "statements": statements},
         sort_keys=True,
         ensure_ascii=False,
     )
@@ -447,7 +417,7 @@ def save_progress_button(run):
             allow_nan=False,
             indent=2,
         ),
-        file_name="fomc_coding_progress.json",
+        file_name="fomc_labor_statements_progress.json",
         mime="application/json",
         on_click="ignore",
         key="download_progress",
@@ -510,7 +480,7 @@ export default function() {
     let row, left, right, handle;
 
     let fraction = Number(
-        sessionStorage.getItem("sampling-form-split") || 0.65
+        sessionStorage.getItem("labor-statements-form-split") || 0.65
     );
     fraction = Math.min(0.8, Math.max(0.3, fraction));
 
@@ -534,7 +504,7 @@ export default function() {
     };
 
     const save = () => {
-        sessionStorage.setItem("sampling-form-split", fraction);
+        sessionStorage.setItem("labor-statements-form-split", fraction);
     };
 
     const move = event => {
@@ -853,7 +823,7 @@ body,
 }
 
 .st-key-detail_canvas [data-testid="stCaptionContainer"] {
-    padding-top: 2px !important;
+    padding-top: 10px !important;
 }
 
 /* Compact controls. */
@@ -872,7 +842,7 @@ body,
 
 def main():
     st.set_page_config(
-        page_title="FOMC Manual Coding",
+        page_title="FOMC Manual Coding · Labor Market Statements",
         layout="wide",
         initial_sidebar_state="collapsed",
     )
@@ -881,7 +851,7 @@ def main():
 
     owner_download_panel()
 
-    st.title("FOMC Manual Coding")
+    st.title("FOMC Manual Coding · Labor Market Statements")
 
     try:
         statements = load_statements()
@@ -955,15 +925,16 @@ def main():
 
         st.markdown(
             f"You will manually code {total} FOMC statements. "
-            "For each statement, identify which inflation indicators are "
+            "For each statement, identify which labor market indicators are "
             "present, describe each present indicator, and assess whether "
             "it is central to the statement."
         )
 
         st.markdown(
             "**Instructions**\n\n"
-            "- Do not use AI to complete the coding.\n"
-            "- Refer to the training form for coding definitions and examples.\n"
+            "- Use the assigned statement as evidence and the training guide for coding rules.\n"
+            "- Do not use AI, Google searches, or other external sources.\n"
+            "- Use light mode.\n"
             "- Answer all required questions for each statement.\n"
             "- Add optional comments after Section 3 if clarification is needed.\n"
             "- Download your progress before leaving if you need to pause."
@@ -1165,7 +1136,7 @@ def main():
             details = draft["details"]
 
             if present:
-                widths = [200, 180, 170, 170, 210]
+                widths = [200, 180, 170, 170, 300]
                 table_width = sum(widths)
 
                 st.markdown(
@@ -1421,6 +1392,7 @@ def main():
                 response = {
                     "submission_id": submission_id,
                     "run_id": run["run_id"],
+                    "form_id": FORM_ID,
                     "form_version": FORM_VERSION,
                     "statement_number": index + 1,
                     "start_timestamp": draft["start_timestamp"],

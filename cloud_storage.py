@@ -52,7 +52,7 @@ def api(method, path, *, token=None, server_write=False, body=None, prefer=None)
 
 
 def save_cloud_response(response, submission_id):
-    api('POST', '/rest/v1/fomc_responses?on_conflict=id', server_write=True,
+    api('POST', '/rest/v1/fomc_labor_statements_responses?on_conflict=id', server_write=True,
         prefer='resolution=ignore-duplicates,return=minimal', body={
             'id': submission_id,
             'start_timestamp': response['start_timestamp'],
@@ -83,7 +83,7 @@ def fetch_owner_rows(token):
     rows, offset = [], 0
     while True:
         page, headers = api('GET',
-            '/rest/v1/fomc_responses?select=id,created_at,payload'
+            '/rest/v1/fomc_labor_statements_responses?select=id,created_at,payload'
             f'&order=created_at.asc,id.asc&offset={offset}&limit=500',
             token=token, prefer='count=exact')
         if not page:
@@ -169,7 +169,7 @@ def owner_download_panel():
         if '_owner_excel' in st.session_state:
             st.caption(f"{st.session_state.get('_owner_count', 0)} submissions")
             st.download_button('Download Excel', st.session_state['_owner_excel'],
-                file_name='manual_coding_responses.xlsx',
+                file_name='labor_statements_responses.xlsx',
                 mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         if st.button('Sign out'):
             try:
