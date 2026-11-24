@@ -9,7 +9,7 @@ import uuid
 import pandas as pd
 import streamlit as st
 
-from cloud_storage import (
+from labor_cloud_storage import (
     StorageError,
     owner_download_panel,
     save_cloud_response,
